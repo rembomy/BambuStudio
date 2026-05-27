@@ -165,13 +165,13 @@ then
     then
         # have to build deps with debug & release or the cmake won't find everything it needs
         mkdir deps/build/release
-        cmake -S deps -B deps/build/release -G Ninja -DDESTDIR="../destdir" ${BUILD_ARGS}
+        cmake -S deps -B deps/build/release -G Ninja -DDESTDIR="../destdir" -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ${BUILD_ARGS}
         cmake --build deps/build/release
         BUILD_ARGS="${BUILD_ARGS} -DCMAKE_BUILD_TYPE=Debug"
     fi
 
-    echo "cmake -S deps -B deps/build -G Ninja ${BUILD_ARGS}"
-    cmake -S deps -B deps/build -G Ninja ${BUILD_ARGS}
+    echo "cmake -S deps -B deps/build -G Ninja -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ${BUILD_ARGS}"
+    cmake -S deps -B deps/build -G Ninja -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ${BUILD_ARGS}
     cmake --build deps/build
 fi
 
@@ -195,6 +195,7 @@ then
     fi
     echo -e "cmake -S . -B build -G Ninja -DCMAKE_PREFIX_PATH="${PWD}/deps/build/destdir/usr/local" -DSLIC3R_STATIC=1 ${BUILD_ARGS}"
     cmake -S . -B build -G Ninja \
+        -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
         -DCMAKE_PREFIX_PATH="${PWD}/deps/build/destdir/usr/local" \
         -DSLIC3R_STATIC=1 \
         ${BUILD_ARGS}
