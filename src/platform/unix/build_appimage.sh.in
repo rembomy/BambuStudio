@@ -2,7 +2,15 @@
 APPIMAGETOOLURL="https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage"
 
 
-APP_IMAGE="@SLIC3R_APP_KEY@_ubu64.AppImage"
+DISTRO_SUFFIX="${BAMBU_APPIMAGE_DISTRO_SUFFIX:-}"
+if [ -z "${DISTRO_SUFFIX}" ] && [ -r /etc/os-release ]; then
+    . /etc/os-release
+    if [ "${ID}" = "fedora" ]; then
+        DISTRO_SUFFIX="fedora_x86_64"
+    fi
+fi
+DISTRO_SUFFIX="${DISTRO_SUFFIX:-ubu64}"
+APP_IMAGE="@SLIC3R_APP_KEY@_${DISTRO_SUFFIX}.AppImage"
 
 wget ${APPIMAGETOOLURL} -O ../appimagetool.AppImage
 chmod +x ../appimagetool.AppImage
