@@ -59,11 +59,21 @@ if [[ -n "$BUILD_IMAGE" ]]
 then
 echo -n "Creating Appimage for distribution..."
 #{
+    DISTRO_SUFFIX="${BAMBU_APPIMAGE_DISTRO_SUFFIX:-}"
+    if [ -z "${DISTRO_SUFFIX}" ] && [ -r /etc/os-release ]; then
+        . /etc/os-release
+        if [ "${ID}" = "fedora" ]; then
+            DISTRO_SUFFIX="fedora_x86_64"
+        fi
+    fi
+    DISTRO_SUFFIX="${DISTRO_SUFFIX:-ubu64}"
+    APP_IMAGE="@SLIC3R_APP_KEY@_${DISTRO_SUFFIX}.AppImage"
+
     pushd package
     chmod +x ../build_appimage.sh
     ../build_appimage.sh
     popd
-    mv package/"@SLIC3R_APP_KEY@_ubu64.AppImage" "@SLIC3R_APP_KEY@_ubu64.AppImage"
+    mv package/"${APP_IMAGE}" "${APP_IMAGE}"
 #} &> $ROOT/Build.log # Capture all command output
 echo "done"
 fi
