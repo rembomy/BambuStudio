@@ -87,6 +87,21 @@ if (SLIC3R_GUI)
         list(APPEND wxWidgets_LIBRARIES ${EXPAT_LIBRARIES})
     endif ()
 
+    # Fedora/lib64 fix: wx-config may report zlib as "libzlibstatic.a" without
+    # adding the dependency prefix's lib64 directory to the link search path.
+    # CMake then turns it into -lzlibstatic, which fails on Fedora because the
+    # vendored static zlib is installed under deps/build/destdir/usr/local/lib64.
+    if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND SLIC3R_STATIC)
+        find_library(ZLIBSTATIC_LIBRARY
+            NAMES zlibstatic libzlibstatic.a
+            PATHS ${CMAKE_PREFIX_PATH}/lib64 ${CMAKE_PREFIX_PATH}/lib
+            NO_DEFAULT_PATH)
+        if(ZLIBSTATIC_LIBRARY)
+            list(FILTER wxWidgets_LIBRARIES EXCLUDE REGEX "zlibstatic")
+            list(APPEND wxWidgets_LIBRARIES ${ZLIBSTATIC_LIBRARY})
+        endif()
+    endif()
+
     # This is an issue in the new wxWidgets cmake build, doesn't deal with librt
     find_library(LIBRT rt)
     if(LIBRT)
