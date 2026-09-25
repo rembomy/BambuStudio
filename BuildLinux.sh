@@ -202,8 +202,9 @@ then
     else
         BUILD_ARGS="${BUILD_ARGS} -DCMAKE_BUILD_TYPE=${SLIC3R_BUILD_TYPE:-Release} -DBBL_RELEASE_TO_PUBLIC=1 -DBBL_INTERNAL_TESTING=${INTERNAL_TESTING}"
     fi
-    echo -e "cmake -S . -B build -G Ninja -DCMAKE_PREFIX_PATH="${PWD}/deps/build/destdir/usr/local" -DSLIC3R_STATIC=1 ${BUILD_ARGS}"
-    cmake -S . -B build -G Ninja \
+    # Rebuilt dependencies may move OpenSSL between lib and lib64; discard cached paths.
+    echo -e "cmake -U 'OPENSSL_*' -S . -B build -G Ninja -DCMAKE_PREFIX_PATH="${PWD}/deps/build/destdir/usr/local" -DSLIC3R_STATIC=1 ${BUILD_ARGS}"
+    cmake -U 'OPENSSL_*' -S . -B build -G Ninja \
         -DCMAKE_PREFIX_PATH="${PWD}/deps/build/destdir/usr/local" \
         -DSLIC3R_STATIC=1 \
         ${BUILD_ARGS}

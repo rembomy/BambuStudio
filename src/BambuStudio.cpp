@@ -1538,6 +1538,10 @@ int CLI::run(int argc, char **argv)
 
     ::setenv("WEBKIT_DISABLE_COMPOSITING_MODE", "1", /* replace */ false);
 
+    // WebKitGTK's DMA-BUF renderer can leave web views blank with the NVIDIA driver.
+    if (::access("/proc/driver/nvidia/version", F_OK) == 0)
+        ::setenv("WEBKIT_DISABLE_DMABUF_RENDERER", "1", /* replace */ false);
+
     // Also on Linux, we need to tell Xlib that we will be using threads,
     // lest we crash when we fire up GStreamer.
     XInitThreads();

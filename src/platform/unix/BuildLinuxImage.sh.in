@@ -44,6 +44,13 @@ export LD_LIBRARY_PATH="\$DIR/bin"
 # 1) BambuStudio will segfault on systems where locale info is not as expected (i.e. Holo-ISO arch-based distro)
 export LC_ALL=C
 
+# GTK3 does not always pick up GNOME's Adwaita dark variant in the AppImage.
+if [ -z "\${GTK_THEME+x}" ] && command -v gsettings >/dev/null 2>&1; then
+    if [ "\$(gsettings get org.gnome.desktop.interface gtk-theme 2>/dev/null)" = "'Adwaita-dark'" ]; then
+        export GTK_THEME=Adwaita:dark
+    fi
+fi
+
 exec "\$DIR/bin/@SLIC3R_APP_CMD@" "\$@"
 EOF
 

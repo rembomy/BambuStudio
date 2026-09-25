@@ -36,6 +36,26 @@ Following platforms are currently supported to compile:
 - Linux, [Compile Guide](https://github.com/bambulab/BambuStudio/wiki/Linux-Compile-Guide)
   - currently we only provide linux appimages on [github releases](https://github.com/bambulab/BambuStudio/releases) for Ubuntu/Fedora, and a [flathub version](https://flathub.org/apps/com.bambulab.BambuStudio) can be used for all the linux platforms
 
+On Fedora 44, with the development packages listed in `linux.d/fedora` installed, build the checked-out source and a beta AppImage with:
+
+```bash
+./BuildLinux.sh -cd
+./BuildLinux.sh -s -t 2
+./BuildLinux.sh -i
+```
+
+The native executable is `build/src/bambu-studio`; the AppImage is `build/BambuStudio_ubu64.AppImage`.
+Beta builds use `~/.config/BambuStudioBeta` by default. To try the beta with a separate copy of your existing settings and presets, run:
+
+```bash
+cp -a "$HOME/.config/BambuStudio" "$HOME/.config/BambuStudio-beta-test"
+./build/BambuStudio_ubu64.AppImage --datadir "$HOME/.config/BambuStudio-beta-test"
+```
+
+The copy keeps beta changes out of the release profile. On NVIDIA systems, the build disables WebKitGTK's DMA-BUF renderer to avoid blank web views; set `WEBKIT_DISABLE_DMABUF_RENDERER=0` before launch to override this workaround. The AppImage launcher selects `Adwaita:dark` when GNOME reports `Adwaita-dark`; an existing `GTK_THEME` value takes precedence. For the native executable, use `GTK_THEME=Adwaita:dark build/src/bambu-studio --datadir "$HOME/.config/BambuStudio-beta-test"` when the editor panels remain light.
+
+The copy alone does not select the copied profile. Pass `--datadir` on every launch; opening the AppImage from a file manager or Gearlever without that option uses `~/.config/BambuStudioBeta`. To use the default path instead, close Studio and copy the contents of `~/.config/BambuStudio` into `~/.config/BambuStudioBeta`, preserving any existing beta profile first.
+
 # Report issue
 You can add an issue to the [github tracker](https://github.com/bambulab/BambuStudio/issues) if **it isn't already present.**
 
@@ -50,4 +70,3 @@ The GNU Affero General Public License, version 3 ensures that if you use any par
 
 The bambu networking plugin is based on non-free libraries. It is optional to the Bambu Studio and provides extended networking functionalities for users.
 By default, after installing Bambu Studio without the networking plugin, you can initiate printing through the SD card after slicing is completed.
-

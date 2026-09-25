@@ -1,0 +1,47 @@
+when:
+  - event: tag
+    ref: refs/tags/fedora-v*
+
+labels:
+  role: build
+  platform: linux/amd64
+
+concurrency: 1
+
+steps:
+  - name: build-fedora-appimage
+    image: fedora:44
+    commands:
+      - |
+        bash <<'BASH'
+        set -euo pipefail
+
+        version=$(sed -n 's/^set(SLIC3R_VERSION "\([^"]*\)")$/\1/p' version.inc)
+        prefix="fedora-v$${version}-beta."
+        if [[ -z "$version" || "$CI_COMMIT_TAG" != "$prefix"* || ! "$${CI_COMMIT_TAG#"$prefix"}" =~ ^[0-9]+$ ]]; then
+          echo "Expected tag: $${prefix}<number>" >&2
+          exit 1
+        fi
+
+        dnf install -y "https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm"
+        source linux.d/fedora
+        dnf install -y "$${REQUIRED_DEV_PACKAGES[@]}" webkit2gtk4.1-devel procps-ng binutils
+
+        CMAKE_BUILD_PARALLEL_LEVEL=2 ./BuildLinux.sh -fdsi -t 2
+        artifact="BambuStudio_$${CI_COMMIT_TAG}_Fedora44_x86_64.AppImage"
+        test -s build/BambuStudio_ubu64.AppImage
+        mv build/BambuStudio_ubu64.AppImage "build/$artifact"
+        (cd build && sha256sum "$artifact" > SHA256SUMS)
+        BASH
+
+  - name: draft-github-release
+    image: woodpeckerci/plugin-release:0.3.1
+    settings:
+      api_key:
+        from_secret: github_release_token
+      files:
+        - build/BambuStudio_fedora-v*_Fedora44_x86_64.AppImage
+        - build/SHA256SUMS
+      file_exists: fail
+      draft: true
+      prerelease: true

@@ -313,7 +313,7 @@ void NotificationManager::PopNotification::render(GLCanvas3D& canvas, float init
 
     use_bbl_theme();
 
-	int window_flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
+	int window_flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
 	if (imgui.begin(name, window_flags)) {
 		ImVec2 win_size = ImGui::GetWindowSize();
 
@@ -403,7 +403,7 @@ void NotificationManager::PopNotification::bbl_render_block_notification(GLCanva
     }
 	push_style_color(ImGuiCol_Text, { 1,1,1,1 }, true, m_current_fade_opacity);
 
-	if (imgui.begin(name, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse)) {
+	if (imgui.begin(name, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav)) {
 		ImVec2 win_size = ImGui::GetWindowSize();
 		ImVec2 win_pos = ImGui::GetWindowPos();
 		if (ImGui::IsMouseHoveringRect(win_pos, win_pos + win_size)) {

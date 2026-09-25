@@ -77,6 +77,9 @@ if (SLIC3R_GUI)
 
     include(${wxWidgets_USE_FILE})
 
+    # wx-config can report a bare archive name even when zlib was installed in lib64.
+    list(TRANSFORM wxWidgets_LIBRARIES REPLACE "^libzlibstatic[.]a$" "${ZLIB_LIBRARIES}")
+
     find_package(JPEG QUIET)
     find_package(TIFF QUIET)
 
