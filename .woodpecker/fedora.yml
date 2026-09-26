@@ -27,7 +27,7 @@ steps:
         source linux.d/fedora
         dnf install -y "$${REQUIRED_DEV_PACKAGES[@]}" webkit2gtk4.1-devel procps-ng binutils
 
-        CMAKE_BUILD_PARALLEL_LEVEL=2 ./BuildLinux.sh -fdsi -t 2
+        CMAKE_BUILD_PARALLEL_LEVEL=8 ./BuildLinux.sh -fdsi -t 2
         artifact="BambuStudio_$${CI_COMMIT_TAG}_Fedora44_x86_64.AppImage"
         test -s build/BambuStudio_ubu64.AppImage
         mv build/BambuStudio_ubu64.AppImage "build/$artifact"
