@@ -11,6 +11,8 @@ concurrency: 1
 steps:
   - name: build-fedora-appimage
     image: fedora:44
+    volumes:
+      - bambustudio-fedora44-deps:/woodpecker/src/github.com/rembomy/BambuStudio/deps/build
     commands:
       - |
         bash <<'BASH'
@@ -27,7 +29,28 @@ steps:
         source linux.d/fedora
         dnf install -y "$${REQUIRED_DEV_PACKAGES[@]}" webkit2gtk4.1-devel procps-ng binutils
 
-        CMAKE_BUILD_PARALLEL_LEVEL=8 ./BuildLinux.sh -fdsi -t 2
+        cache_dir=deps/build
+        mkdir -p "$cache_dir"
+        cache_key=$(
+          { git rev-parse HEAD:deps HEAD:BuildLinux.sh HEAD:linux.d/fedora; rpm -qa | LC_ALL=C sort; } |
+            sha256sum | cut -d' ' -f1
+        )
+        cache_marker="$cache_dir/.woodpecker-cache-key"
+        cache_refresh=false
+        if [[ ! -f "$cache_marker" || "$(cat "$cache_marker")" != "$cache_key" ]] ||
+           [[ -n "$(find "$cache_marker" -mtime +29 -print)" ]]; then
+          echo "Refreshing Fedora dependency cache"
+          find "$cache_dir" -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
+          cache_refresh=true
+        else
+          echo "Reusing Fedora dependency cache"
+        fi
+
+        CMAKE_BUILD_PARALLEL_LEVEL=8 ./BuildLinux.sh -fd -t 2
+        if [[ "$cache_refresh" == true ]]; then
+          printf '%s\n' "$cache_key" > "$cache_marker"
+        fi
+        CMAKE_BUILD_PARALLEL_LEVEL=8 ./BuildLinux.sh -fsi -t 2
         artifact="BambuStudio_$${CI_COMMIT_TAG}_Fedora44_x86_64.AppImage"
         test -s build/BambuStudio_ubu64.AppImage
         mv build/BambuStudio_ubu64.AppImage "build/$artifact"

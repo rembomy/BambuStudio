@@ -175,13 +175,13 @@ then
         # have to build deps with debug & release or the cmake won't find everything it needs
         mkdir deps/build/release
         cmake -S deps -B deps/build/release -G Ninja -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DDESTDIR="../destdir" ${BUILD_ARGS}
-        cmake --build deps/build/release
+        cmake --build deps/build/release --parallel 1
         BUILD_ARGS="${BUILD_ARGS} -DCMAKE_BUILD_TYPE=Debug"
     fi
 
     echo "cmake -S deps -B deps/build -G Ninja ${BUILD_ARGS}"
     cmake -S deps -B deps/build -G Ninja -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ${BUILD_ARGS}
-    cmake --build deps/build
+    cmake --build deps/build --parallel 1
 fi
 
 if [[ -n "${BUILD_BAMBU_STUDIO}" ]]
